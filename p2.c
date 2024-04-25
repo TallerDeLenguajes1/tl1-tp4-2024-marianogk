@@ -26,19 +26,21 @@ void mostrarTareas(Nodo **Start);
 void moverTareas(Nodo **Pendientes, Nodo **Realizadas, int id);
 void EliminarNodo(Nodo **Start, int id);
 void LiberarLista(Nodo **Start);
+Nodo *buscarTareaId(Nodo **Start, int id);
+Nodo *buscarTareaPalabra(Nodo **Start, char *palabra);
 
 int main()
 {
 
-    Nodo *TareasPendientes, *TareasRealizadas;
+    Nodo *TareasPendientes, *TareasRealizadas, *tarea1, *tarea2;
 
-    // Nodo *TareasPendientes = (Nodo *)malloc(sizeof(Nodo *));
-    // Nodo *TareasRealizadas = (Nodo *)malloc(sizeof(Nodo *));
-
-    int idM, seguirM = 0;
+    int idM, idB, seguirM = 0, seguirB = 0;
+    char *palabra = (char *) malloc(15 * sizeof(char));
 
     TareasPendientes = CrearListaVacia();
     TareasRealizadas = CrearListaVacia();
+    tarea1 = CrearListaVacia();
+    tarea2 = CrearListaVacia();
 
     // Agregar tareas
 
@@ -50,12 +52,12 @@ int main()
 
     do
     {
-        puts("\n\nIngrese el ID de la tarea realizada a mover: ");
+        puts("\n\n2.Ingrese el ID de la tarea realizada a mover: ");
         scanf("%d", &idM);
 
         moverTareas(&TareasPendientes, &TareasRealizadas, idM);
 
-        printf("\nQuiere mover otra tarea?      1.SI   |   2.NO  : ");
+        printf("\n\nQuiere mover otra tarea?      1.SI   |   2.NO  : ");
         scanf("%d", &seguirM);
     } while (seguirM == 1);
 
@@ -64,10 +66,81 @@ int main()
     puts("\n\n-TAREAS REALIZADAS-");
     mostrarTareas(&TareasRealizadas);
 
+    // Buscar tareas por ID
+    
+    do
+    {
+        puts("\n\n3.Ingrese el ID de la tarea a buscar: ");
+        scanf("%d", &idB);
+
+        tarea1 = buscarTareaId(&TareasPendientes, idB);
+        tarea2 = buscarTareaId(&TareasRealizadas, idB);
+
+        if (tarea1 || tarea2)
+        {
+            if (tarea1)
+            {
+                puts("\nLa tarea se encuentra en Pendientes");
+                mostrarTareas(&tarea1);
+            }
+            else
+            {
+                puts("\nLa tarea se encuentra en Realizadas");
+                mostrarTareas(&tarea2);
+            }
+        }
+        else
+        {
+            puts("\nNo se encuentra la tarea");
+        }
+
+        printf("\nQuiere buscar otra tarea?      1.SI   |   2.NO  : ");
+        scanf("%d", &seguirB);
+    } while (seguirB == 1);
+
+    // Buscar tareas por palabra
+
+    seguirB = 0;
+
+    do
+    {
+        puts("\n\n4.Ingrese la palabra de la tarea a buscar: ");
+        fflush(stdin);
+        gets(palabra);
+
+        tarea1 = buscarTareaPalabra(&TareasPendientes, palabra);
+        tarea2 = buscarTareaPalabra(&TareasRealizadas, palabra);
+
+        if (tarea1 || tarea2)
+        {
+            if (tarea1)
+            {
+                puts("\nLa tarea se encuentra en Pendientes");
+                mostrarTareas(&tarea1);
+            }
+            else
+            {
+                puts("\nLa tarea se encuentra en Realizadas");
+                mostrarTareas(&tarea2);
+            }
+        }
+        else
+        {
+            puts("\nNo se encuentra la tarea");
+        }
+
+        printf("\n\nQuiere buscar otra tarea?      1.SI   |   2.NO  : ");
+        scanf("%d", &seguirB);
+    } while (seguirB == 1);
+
     // Liberar listas de tareas
 
     LiberarLista(&TareasPendientes);
     LiberarLista(&TareasRealizadas);
+    LiberarLista(&tarea1);
+    LiberarLista(&tarea2);
+
+    puts("\nFin");
 
     return 0;
 }
@@ -95,8 +168,6 @@ Nodo *CrearNodo(int id)
     Nnodo->T.Duracion = duracion;
 
     Nnodo->Siguiente = NULL;
-
-    // free(descripcion);
 
     return Nnodo;
 }
@@ -207,3 +278,44 @@ void LiberarLista(Nodo **Start)
 
     *Start = NULL;
 }
+
+Nodo *buscarTareaId(Nodo **Start, int id)
+{
+    Nodo *actual = *Start;
+
+    while (actual != NULL && actual->T.TareaID != id)
+    {
+        actual = actual->Siguiente;
+    }
+
+    if (actual != NULL && actual->T.TareaID == id)
+    {
+
+        return actual;
+    }
+    else
+    {
+        return NULL;
+    }
+}
+
+Nodo *buscarTareaPalabra(Nodo **Start, char *palabra)
+{
+    Nodo *actual = *Start;
+
+    while (actual != NULL && strstr(actual->T.Descripcion, palabra) == NULL)
+    {
+        actual = actual->Siguiente;
+    }
+
+    if (actual != NULL && strstr(actual->T.Descripcion, palabra) != NULL)
+    {
+
+        return actual;
+    }
+    else
+    {
+        return NULL;
+    }
+}
+
